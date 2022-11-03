@@ -1,0 +1,1 @@
+Mine solutions in scala for https://adventofcode.com/
