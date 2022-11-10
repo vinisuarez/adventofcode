@@ -1,5 +1,6 @@
 package day7
 
+import scala.annotation.tailrec
 import scala.io.Source
 
 object TheTreacheryOfWhales2 {
@@ -11,6 +12,7 @@ object TheTreacheryOfWhales2 {
     println(findBestFuel(input, 0, input.max, Int.MaxValue))
   }
 
+  @tailrec
   private def findBestFuel(input: Seq[Int], currentPosition:Int, maxPosition: Int, bestConsumption: Int): Int = {
     if (currentPosition == maxPosition) bestConsumption
     else {
