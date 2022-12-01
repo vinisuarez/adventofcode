@@ -1,1 +1,1 @@
-Mine solutions in scala for https://adventofcode.com/
+My solutions in scala for https://adventofcode.com/
