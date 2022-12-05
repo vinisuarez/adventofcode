@@ -1,38 +1,29 @@
 package day5
 
 import scala.annotation.tailrec
-import scala.collection.mutable
 import scala.io.Source
 
 object SupplyStacks {
-
   def main(args: Array[String]): Unit = {
     val str = Source.fromFile(System.getProperty("user.dir") + "/2022/day5/input.txt")
     val input = str.getLines().toSeq
-
-
-    val creates = input.take(3).map(s => if (s.startsWith(" ") Array(s.take(3)) ++ s.drop(4).grouped(4).toArray).toArray
-    val moves = input.drop(5)
-
-    println(run(creates, moves))
+    val creates = input.take(8).map(s => s.grouped(4).toArray).toArray.transpose.map(_.dropWhile(c => c.equals("    ") || c.equals("   ")))
+    val moves = input.drop(10)
+    println(run(creates.clone(), moves, shouldReverse = true))
+    println(run(creates.clone(), moves, shouldReverse = false))
   }
-
-
 
   @tailrec
-  def run(creates: Array[Array[String]], moves: Seq[String]): String = {
-    if (moves.isEmpty) getTopCreates(creates)
+  def run(creates: Array[Array[String]], moves: Seq[String], shouldReverse: Boolean): String = {
+    if (moves.isEmpty) creates.map(_.head.charAt(1).toString).mkString
     else {
-      val move = moves.head
-      val quantity = move.charAt(5).toString.toInt
-      val from = move.charAt(12).toString.toInt
-      val to = move.charAt(17).toString.toInt
-
-      creates(to) = creates(from).take(quantity).reverse ++ creates(to)
-      creates(from) = 
-      run(creates, moves.tail)
+      val pattern = "move ([0-9]+) from ([0-9]+) to ([0-9]+)".r
+      val (quantity, from, to) = moves.head match {
+        case pattern(q, f, t) => (q.toInt, f.toInt - 1, t.toInt - 1)
+      }
+      creates(to) = (if (shouldReverse) creates(from).take(quantity).reverse else creates(from).take(quantity)) ++ creates(to)
+      creates(from) = creates(from).drop(quantity)
+      run(creates, moves.tail, shouldReverse)
     }
   }
-
-  def getTopCreates(creates: Array[Array[String]]): String = ???
 }
