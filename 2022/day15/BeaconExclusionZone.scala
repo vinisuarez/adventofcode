@@ -5,23 +5,36 @@ import scala.io.Source
 object BeaconExclusionZone {
   def main(args: Array[String]): Unit = {
     val str = Source.fromFile(System.getProperty("user.dir") + "/2022/day15/input.txt")
-    val input = str.getLines().toSeq
+    val input = str.getLines().map(i => parse(i)).toSeq
 
-    val (sx, sy, bx, by) = parse(input.head)
+    val first = input.map(i => {
+      val distance = (i._1 - i._3).abs + (i._2 - i._4).abs - (i._2 - 2000000).abs
+      (i._1 - distance, i._1 + distance)
+    }).filter(i => i._1 <= i._2)
+    println(run(first.sortBy(_._1)).map(r => r._2 - r._1).sum)
 
-    println((sx,sy))
-    println((bx,by))
   }
-
   def parse(input: String): (Int, Int, Int, Int) = {
-    val pattern = "Sensor at x=(-?\\d+), y=(-?\\d+): closest beacon is at x=(-?\\d+), y=(-?\\d+)".r
-    val (ax, ay, bx, by) = input.head match {
-      case pattern(ax, ay, bx, by) => (ax.toInt, ay.toInt, bx.toInt, by.toInt)
-    }
-    (ax, ay, bx, by)
+    val split = input
+      .replace("Sensor at x=", "")
+      .replace(": closest beacon is at x=", ",")
+      .replace(" y=", "")
+      .split(",")
+    (split(0).toInt, split(1).toInt, split(2).toInt, split(3).toInt)
   }
 
-  def distance(a: (Int, Int), b: (Int, Int)): Int = {
-    (a._1 - b._1).abs + (a._2 - b._2).abs
+  def run(ranges: Seq[(Int, Int)]): Seq[(Int, Int)] = {
+    var simplified = Array(ranges.head)
+    (1 until ranges.size).foreach(i => {
+      val current = ranges(i)
+      val last = simplified.last
+
+      if (current._1 <= last._2 + 1) {
+        simplified(simplified.length - 1) = (last._1, Math.max(last._2, current._2))
+      } else {
+        simplified = simplified :+ current
+      }
+    })
+    simplified
   }
 }
